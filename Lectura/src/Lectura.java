@@ -3,6 +3,16 @@ import java.io.FileReader;
 import java.io.IOException;
 public class Lectura {
 
+	public static boolean existePalabra(String linea, String palabra){
+		String[] palabras = linea.split("\\W+");
+		for (String palabra2 : palabras){
+			if (palabra2.equals(palabra)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean declaracion(String linea){
 		String[] lineas = linea.split(" ");
 		if (lineas.length == 2)
@@ -31,19 +41,19 @@ public class Lectura {
 					ciclos--;
 				}
 			}
-			else if (line.contains("if")){
+			else if (existePalabra(line,"if")){
 				System.out.print("if: ");
 				anidacion(ciclos);
 				System.out.println("\t\t\t\t" + line.substring(0,line.length()-1));
 				ciclos++;
 			}
-			else if (line.contains("for")){
+			else if (existePalabra(line,"for")){
 				System.out.print("for: ");
 				anidacion(ciclos);
 				System.out.println("\t\t\t\t" + line.substring(0,line.length()-1));
 				ciclos++;
 			}
-			else if (line.contains("while")){
+			else if (existePalabra(line,"while")){
 				System.out.print("while: ");
 				anidacion(ciclos);
 				System.out.println("\t\t\t\t" + line.substring(0,line.length()-1));
@@ -62,7 +72,7 @@ public class Lectura {
 					anidacion(ciclos);
 					System.out.println("\t" + line.substring(0,line.length()-1));
 				}
-				else if (line.contains("class"))
+				else if (existePalabra(line,"class"))
 					System.out.println("Crea la clase");
 				else {
 					System.out.print("Acción: ");
