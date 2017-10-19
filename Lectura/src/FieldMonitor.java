@@ -1,5 +1,7 @@
 import java.io.IOException;
+import java.util.List;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.event.ClassPrepareEvent;
@@ -21,10 +23,10 @@ public class FieldMonitor {
   public static void main(String[] args)
       throws IOException, InterruptedException {
     // connect
-    VirtualMachine vm = (VirtualMachine) new VMAcquirer().connect(8000);
+    VirtualMachine vm = new VMAcquirer().connect(8000);
 
     // set watch field on already loaded classes
-    java.util.List<ReferenceType> referenceTypes = vm
+    List<ReferenceType> referenceTypes = vm
         .classesByName(CLASS_NAME);
     for (ReferenceType refType : referenceTypes) {
       addFieldWatch(vm, refType);
@@ -76,7 +78,7 @@ public class FieldMonitor {
   private static void addFieldWatch(VirtualMachine vm,
       ReferenceType refType) {
     EventRequestManager erm = vm.eventRequestManager();
-    com.sun.jdi.Field field = refType.fieldByName(FIELD_NAME);
+    Field field = refType.fieldByName(FIELD_NAME);
     ModificationWatchpointRequest modificationWatchpointRequest = erm
         .createModificationWatchpointRequest(field);
     modificationWatchpointRequest.setEnabled(true);

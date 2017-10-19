@@ -2,11 +2,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.sun.jdi.Bootstrap;
+import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.VirtualMachineManager;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
-import com.sun.tools.attach.VirtualMachine;
 
 public class VMAcquirer {
 
@@ -51,7 +51,7 @@ public class VMAcquirer {
     }
     pidArgument.setValue(port);
 
-    return (VirtualMachine) connector.attach(args);
+    return connector.attach(args);
   }
 
 }
