@@ -103,6 +103,7 @@ public class JDIEventMonitor extends Thread
         EventSet eventSet = queue.remove();
         for(Event event : eventSet)
           handleEvent(event);
+
         eventSet.resume();
       }
       catch (InterruptedException e) { }  // Ignore
