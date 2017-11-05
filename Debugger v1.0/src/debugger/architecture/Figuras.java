@@ -172,11 +172,16 @@ public class Figuras extends JPanel{
 		String clase = s.next();
 		leer(s.nextInt());
 		s.close();
-		JFrame frame = new JFrame();
-		frame.getContentPane().add(new Figuras(clase));
+		JFrame frame = new JFrame("Debugger");
+		Figuras fig = new Figuras(clase);
+		frame.setContentPane(fig);
 		frame.setLayout(new GridLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1300,700);
 		frame.setVisible(true);
+		System.out.println(frame.getGraphics());
+		Graphics g = frame.getGraphics();
+		g.drawString("LOLOLOLOL",400,400);
+		frame.update(g);
 	}
 }

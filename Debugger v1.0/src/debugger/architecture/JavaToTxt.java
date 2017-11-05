@@ -16,7 +16,6 @@ public class JavaToTxt {
 					pw.printf(line);
 					pw.printf("%n");
 					code.add(line);
-					System.out.println(line);
 				}
 			}
 		} catch (Exception e) {

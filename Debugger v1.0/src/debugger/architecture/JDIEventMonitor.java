@@ -352,7 +352,7 @@ public class JDIEventMonitor extends Thread
     try {   // print the line
       String fnm = loc.sourceName();  // get filename of code
       System.out.println(fnm + ": " + showCode.show(fnm, loc.lineNumber()) );
-
+      Lectura.buscar(showCode.show(fnm, loc.lineNumber()));
     }
     catch (AbsentInformationException e) {}
 

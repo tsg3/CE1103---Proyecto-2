@@ -1,22 +1,19 @@
 package debugger.architecture;
 public class Clase2 {
-	static String JULS = "asdasd";
-	void imprimir(String texto){
-		System.out.println(texto);
-	}
 	public static void main(String[] args) {
-		Clase2 clase = new Clase2();
-		String mensaje;
-		mensaje = "Hola Mundo";
-		if (mensaje.equals("Hola Mundo")){
-			mensaje += "!";
-			for (int i = 0; i<3; i++)
-				clase.imprimir(mensaje);
-			int j=0;
+		Clase2 c = new Clase2();
+		String mensaje = "Hola Mundo";
+		int i = 0;
+		int j = 0;
+		while (i<3){
+			System.out.println(mensaje);
 			while (j<3){
-				clase.imprimir(mensaje);
+				System.out.println(mensaje);
 				j++;
 			}
+			i++;
 		}
+		System.out.println("Fin");
+		System.out.println(".");
 	}
 }
