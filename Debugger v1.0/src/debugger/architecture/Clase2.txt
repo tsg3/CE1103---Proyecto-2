@@ -5,7 +5,7 @@ public class Clase2 {
 		String mensaje = "Hola Mundo";
 		int i = 0;
 		int j = 0;
-		while (i<3){
+		if (true){
 			System.out.println(mensaje);
 			while (j<3){
 				System.out.println(mensaje);
