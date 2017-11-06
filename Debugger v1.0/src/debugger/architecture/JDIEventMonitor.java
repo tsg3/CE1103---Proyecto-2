@@ -8,10 +8,8 @@ package debugger.architecture;
 
 /* Monitor incoming JDI events for a program running in the JVM
    and print out trace/debugging information.
-
    This is a simplified version of EventThread.java from the Trace.java
    example in the demo/jpda/examples.jar file in the JDK.
-
    The main addition is the use of the ShowCodes and ShowLines classes
    to list the line being currently executed.
 */
@@ -23,11 +21,9 @@ import com.sun.jdi.event.*;
 
 import java.util.*;
 
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.event.EventListenerList;
+
 
 
 
@@ -39,9 +35,10 @@ public class JDIEventMonitor extends Thread
   private final VirtualMachine vm;   // the JVM
   private boolean connected = true;  // connected to VM?
   private boolean vmDied;            // has VM death occurred?
-
   private ShowCode showCode;
-
+  public static ListaVariables lista = new ListaVariables();
+  public static ListaVariables ejecuciones = new ListaVariables();
+  public static volatile boolean value=false;
 
   public JDIEventMonitor(VirtualMachine jvm)
   {
@@ -120,30 +117,55 @@ public class JDIEventMonitor extends Thread
   // process a JDI event
   {
     // method events
-    if (event instanceof MethodEntryEvent)
-      methodEntryEvent((MethodEntryEvent) event);
-    else if (event instanceof MethodExitEvent)
-      methodExitEvent((MethodExitEvent) event);
+    if (event instanceof MethodEntryEvent){
+    		methodEntryEvent((MethodEntryEvent) event);
+    }
+    else if (event instanceof MethodExitEvent){
+    		methodExitEvent((MethodExitEvent) event);
+
+    }
 
     // class events
-    else if (event instanceof ClassPrepareEvent)
-      classPrepareEvent((ClassPrepareEvent) event);
-    else if (event instanceof ClassUnloadEvent)
-      classUnloadEvent((ClassUnloadEvent) event);
+    else if (event instanceof ClassPrepareEvent){
+    		classPrepareEvent((ClassPrepareEvent) event);
+    }
+
+
+    else if (event instanceof ClassUnloadEvent){
+    		classUnloadEvent((ClassUnloadEvent) event);
+    }
 
     // thread events
-    else if (event instanceof ThreadStartEvent)
-      threadStartEvent((ThreadStartEvent) event);
+    else if (event instanceof ThreadStartEvent){
+    		threadStartEvent((ThreadStartEvent) event);
+    }
     else if (event instanceof ThreadDeathEvent)
       threadDeathEvent((ThreadDeathEvent) event);
 
     // step event -- a line of code is about to be executed
-    else if (event instanceof StepEvent)
-      stepEvent((StepEvent) event);
-
+    else if (event instanceof StepEvent){
+    	while (!value)
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	stepEvent((StepEvent) event);
+    	value=false;
+    }
     // modified field event  -- a field is about to be changed
-    else if (event instanceof ModificationWatchpointEvent)
-      fieldWatchEvent((ModificationWatchpointEvent) event);
+    else if (event instanceof ModificationWatchpointEvent){
+    	while (!value)
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	fieldWatchEvent((ModificationWatchpointEvent) event);
+    	value=false;
+    }
 
     // VM events
     else if (event instanceof VMStartEvent)
@@ -193,12 +215,15 @@ public class JDIEventMonitor extends Thread
     String className = meth.declaringType().name();
 
     System.out.println();
-    if (meth.isConstructor())
+    if (meth.isConstructor()){
       System.out.println("entered " + className + " constructor");
-    else
+      ejecuciones.add("entered " + className + " constructor","");
+    }
+    else{
       System.out.println("entered " + className +  "." + meth.name() +"()");
+      ejecuciones.add("entered " + className +  "." + meth.name() +"()","");
+    }
   }  // end of methodEntryEvent()
-
 
 
   private void methodExitEvent(MethodExitEvent event)
@@ -207,12 +232,15 @@ public class JDIEventMonitor extends Thread
     Method meth = event.method();
     String className = meth.declaringType().name();
 
-    if (meth.isConstructor())
+    if (meth.isConstructor()){
       System.out.println("exiting " + className + " constructor");
-    else
+      ejecuciones.add("exiting " + className + " constructor","");
+    }
+    else{
       System.out.println("exiting " + className + "." + meth.name() + "()" );
     System.out.println();
-
+    ejecuciones.add("exiting " + className + "." + meth.name() + "()","");
+    }
   }  // end of methodExitEvent()
 
 
@@ -225,7 +253,10 @@ public class JDIEventMonitor extends Thread
     ReferenceType ref = event.referenceType();
 
     List<Field> fields = ref.fields();
+   // System.out.println(ref.methods().get(1));
     List<Method> methods = ref.methods();
+    //methods.remove(1);
+
 
     String fnm;
     try {
@@ -235,14 +266,22 @@ public class JDIEventMonitor extends Thread
     catch (AbsentInformationException e)
     {  fnm = "??"; }
 
+    ejecuciones.add("loaded class: " + ref.name() + " from " + fnm +
+            " - fields=" + fields.size() + ", methods=" + methods.size() ,"");
+
     System.out.println("loaded class: " + ref.name() + " from " + fnm +
                     " - fields=" + fields.size() + ", methods=" + methods.size() );
 
     System.out.println("  method names: ");
-    for(Method m : methods)
+    ejecuciones.add("  method names: " ,"");
+    for(Method m : methods){
       System.out.println("    | " + m.name() +   "()" );
-
+      ejecuciones.add("    | " + m.name() +   "()" ,"");
+    }
+    System.out.println (fields);
+    ejecuciones.add(fields.toString() ,"");
     setFieldsWatch(fields);
+    //System.out.println(fields);
   }  // end of classPrepareEvent()
 
 
@@ -251,7 +290,10 @@ public class JDIEventMonitor extends Thread
   // Set modification watchpoints on each of the loaded class's fields
   {
     EventRequestManager mgr = vm.eventRequestManager();
-
+    for (Field field : fields) {
+    	 System.out.println("la modificacion" + field);
+    	 ejecuciones.add("la modificacion" + field ,"");
+    }
     for (Field field : fields) {
       ModificationWatchpointRequest req =
                 mgr.createModificationWatchpointRequest(field);
@@ -267,8 +309,10 @@ public class JDIEventMonitor extends Thread
   private void classUnloadEvent(ClassUnloadEvent event)
   // a class has been unloaded
   {
-    if (!vmDied)
+    if (!vmDied){
       System.out.println("unloaded class: " + event.className());
+      ejecuciones.add("unloaded class: " + event.className() ,"");
+    }
   }
 
 
@@ -281,6 +325,7 @@ public class JDIEventMonitor extends Thread
      Field f = event.field();
      Value value = event.valueToBe();   // value that _will_ be assigned
      System.out.println("    > " + f.name() + " = " + value);
+     ejecuciones.add("    > " + f.name() + " = " + value,"");
   }  // end of fieldWatchEvent()
 
 
@@ -301,7 +346,7 @@ public class JDIEventMonitor extends Thread
       return;
 
     System.out.println(thr.name() + " thread started");
-
+    ejecuciones.add(thr.name() + " thread started","");
     setStepping(thr);
   } // end of threadStartEvent()
 
@@ -336,6 +381,7 @@ public class JDIEventMonitor extends Thread
       return;
 
     System.out.println(thr.name() + " thread about to die");
+    ejecuciones.add(thr.name() + " thread about to die","");
   }  // end of threadDeathEvent()
 
 
@@ -352,12 +398,14 @@ public class JDIEventMonitor extends Thread
     try {   // print the line
       String fnm = loc.sourceName();  // get filename of code
       System.out.println(fnm + ": " + showCode.show(fnm, loc.lineNumber()) );
-      Lectura.buscar(showCode.show(fnm, loc.lineNumber()));
+      ejecuciones.add(fnm + ": " + showCode.show(fnm, loc.lineNumber()),"");
+
     }
     catch (AbsentInformationException e) {}
 
     if (loc.codeIndex() == 0)   // at the start of a method
       printInitialState( event.thread() );
+
   }  // end of stepEvent()
 
 
@@ -380,6 +428,7 @@ public class JDIEventMonitor extends Thread
     ObjectReference objRef = currFrame.thisObject();   // get 'this' object
     if (objRef != null) {
       System.out.println("  object: " + objRef.toString());
+      ejecuciones.add("  object: " + objRef.toString(),"");
       printFields(objRef);
     }
   }  // end of printInitialState()
@@ -399,13 +448,23 @@ public class JDIEventMonitor extends Thread
       return;
     }
 
-    if (locals.size() == 0)   // no local vars in the list
-      return;
-
+    if (locals.size() == 0) {  // no local vars in the list
+    	return;
+    }
     System.out.println("  locals: ");
-    for(LocalVariable l : locals)
-      System.out.println("    | " + l.name() +
-                               " = " + currFrame.getValue(l) );
+    ejecuciones.add("  locals: ","");
+
+    for(LocalVariable l : locals){
+    	//lista.add(l.name(), currFrame.getValue(l));
+    	System.out.println("    | " + l.name() +
+                " = " + currFrame.getValue(l) );
+  		  lista.add(l.name(), currFrame.getValue(l));
+  		 ejecuciones.add("    | " + l.name() +
+                 " = " + currFrame.getValue(l),"");
+
+    }
+    //for(int x = 0 ; x<v.size();x++)
+    	//System.out.println(v.get(x));
   }  // end of printLocals()
 
 
@@ -425,8 +484,11 @@ public class JDIEventMonitor extends Thread
     }
 
     System.out.println("  fields: ");
-    for(Field f : fields)
-      System.out.println("    | " + f.name() + " = " + objRef.getValue(f) );
+    ejecuciones.add("  fields: ","");
+    for(Field f : fields){
+      System.out.println("    | " + f.name() + " = " + objRef.getValue(f));
+      ejecuciones.add("    | " + f.name() + " = " + objRef.getValue(f),"");
+    }
   }  // end of printFields()
 
 
@@ -438,6 +500,7 @@ public class JDIEventMonitor extends Thread
      been executed. */
   { vmDied = false;
     System.out.println("-- VM Started --");
+    ejecuciones.add("-- VM Started --","");
   }
 
 
@@ -447,13 +510,14 @@ public class JDIEventMonitor extends Thread
     System.out.println("-- The application has exited --");
   }
 
-
   private void vmDisconnectEvent(VMDisconnectEvent event)
   /* Notification of disconnection from the VM, either through normal termination
      or because of an exception/error. */
   { connected = false;
-    if (!vmDied)
+    if (!vmDied){
       System.out.println("-- The application has been disconnected --");
+      ejecuciones.add("-- The application has been disconnected --","");
+    }
   }
 
 }  // end of JDIEventMonitor class

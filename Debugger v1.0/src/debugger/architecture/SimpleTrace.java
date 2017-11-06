@@ -4,13 +4,16 @@ import com.sun.jdi.*;
 import com.sun.jdi.connect.*;
 
 import java.util.*;
+
+import javax.swing.JButton;
+
 import java.io.*;
 import java.net.*;
 
 
 public class SimpleTrace
 {
-
+	public static JDIEventMonitor watcher;
   public SimpleTrace()
   {
     VirtualMachine vm = launchConnect();
@@ -63,6 +66,7 @@ public class SimpleTrace
   private void monitorJVM(VirtualMachine vm)
   {
     JDIEventMonitor watcher = new JDIEventMonitor(vm);
+    this.watcher=watcher;
     watcher.start();
     Process process = vm.process();
     Thread errRedirect = new StreamRedirecter("error reader",process.getErrorStream(), System.err);
