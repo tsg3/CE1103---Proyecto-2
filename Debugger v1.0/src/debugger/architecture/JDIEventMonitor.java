@@ -39,6 +39,7 @@ public class JDIEventMonitor extends Thread
   public static ListaVariables lista = new ListaVariables();
   public static ListaVariables ejecuciones = new ListaVariables();
   public static volatile boolean value=false;
+  public static boolean into=true;
 
   public JDIEventMonitor(VirtualMachine jvm)
   {
@@ -145,8 +146,10 @@ public class JDIEventMonitor extends Thread
     // step event -- a line of code is about to be executed
     else if (event instanceof StepEvent){
     	while (!value)
+    		if (into==false)
+    			break;
 			try {
-				sleep(1000);
+				sleep(250);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -158,7 +161,9 @@ public class JDIEventMonitor extends Thread
     else if (event instanceof ModificationWatchpointEvent){
     	while (!value)
 			try {
-				sleep(1000);
+				if (into==false)
+	    			break;
+				sleep(250);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
