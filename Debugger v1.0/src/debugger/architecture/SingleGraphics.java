@@ -3,30 +3,45 @@ package debugger.architecture;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Stack;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class SingleGraphics extends JPanel {
 
+	private static SingleGraphics instance = null;
 	public ListaVariables vars = new ListaVariables();
-	public Diagrama diagram = new Diagrama();
+	public static Diagrama diagram;
 	public String clase;
+	public String[] codigo;
 	public Stack<Integer> stack = new Stack<Integer>();
+	public AbstractLinesFactory abstractFactory = new AbstractLinesFactory();
 
-	public SingleGraphics(String clase){
-		this.clase = clase;
+	public static SingleGraphics getInstance(String clase,Diagrama diagram,String[] codigo){
+		if (instance==null){
+			try {
+				instance = new SingleGraphics( clase, diagram, codigo);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return instance;
 	}
 
-	public static boolean declaracion(String linea){
-		String[] lineas = linea.split(" ");
-		if (lineas.length == 2)
-			return true;
-		return false;
+	protected SingleGraphics(String clase,Diagrama diagram,String[] codigo) throws IOException{
+		this.clase = clase;
+		this.diagram=diagram;
+		this.codigo = codigo;
 	}
 
 	public void paint(Graphics g){
-
 		int i = 0;
 		g.setFont(new Font("Lucida",Font.PLAIN,14));
 		g.setColor(Color.BLACK);
@@ -34,47 +49,14 @@ public class SingleGraphics extends JPanel {
 			g.drawString(vars.variable(i).getName()+"="+vars.variable(i).getValue(),10,600+vars.variable(i).getY());
 			i++;
 		}
-		JavaToTxt txt = new JavaToTxt();
-		Codigo code = txt.addCode(clase);
 		int k = 0;
-		String[] codigo = new String[code.largo];
-		while (k<code.largo){
-			codigo[k]=code.linea(k);
-			k++;
-		}
-		k=0;
-		int renglon=1;
+		int renglon = 1;
 		while (k<codigo.length){
 			g.drawString(codigo[k],0, 14*renglon);
 			k++;
 			renglon++;
 		}
-		for (int j=0;j<codigo.length;j++){
-			if ((codigo[j].contains("if("))||(codigo[j].contains("if ("))){
-				diagram.add(codigo[j].replace("{",""));
-			}
-			else if ((codigo[j].contains("for("))||(codigo[j].contains("for ("))){
-				diagram.add(codigo[j].replace("{",""));
-			}
-			else if ((codigo[j].contains("while("))||(codigo[j].contains("while ("))){
-				diagram.add(codigo[j].replace("{",""));
-			}
-			else {
-				if (((declaracion(codigo[j])) || (codigo[j].contains("new")))&&!((codigo[j].contains("import"))||((codigo[j].contains("package"))))){
-					diagram.add(codigo[j].replace(";",""));
-				}
-				else if ((codigo[j].contains("="))||(codigo[j].contains("++"))||(codigo[j].contains("--"))){
-					diagram.add(codigo[j].replace(";",""));
-				}
-				else {
-				if ((codigo[j].contains("("))&&(codigo[j].contains(")"))&&(codigo[j].contains(";"))){
-					diagram.add(codigo[j].replace(";",""));
-				}
-				}
-			}
-			if (codigo[j].contains("}"))
-				diagram.ciclos++;
-		}
+		this.diagram=diagram;
 		g.setFont(new Font("TimesRoman",Font.PLAIN,20));
 		g.setColor(Color.BLUE);
 		i=0;
@@ -88,8 +70,8 @@ public class SingleGraphics extends JPanel {
 				if (diagram.figura(i+1).getY()==(i+1)*50+(j+1)*30){
 					int startLine = stack.pop();
 					int finalLine = i;
-
-					if ((diagram.figura(startLine).getLine().contains("while"))||(diagram.figura(startLine).getLine().contains("for"))){
+					abstractFactory.createLines(g, diagram.figura(startLine).getLine(), diagram.figura(lineaLarga).getLine(), diagram.figura(finalLine).getY(), diagram.figura(startLine).getY(), this.getWidth(), j);
+					/*if ((diagram.figura(startLine).getLine().contains("while"))||(diagram.figura(startLine).getLine().contains("for"))){
 						g.drawLine(400+380-10*(diagram.figura(startLine).getLine().length()/4)-20, diagram.figura(startLine).getY()+25, 400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20-30-(j*30), diagram.figura(startLine).getY()+25);
 						g.drawLine(400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20-30-(j*30), diagram.figura(startLine).getY()+25, 400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20-30-(j*30), diagram.figura(finalLine).getY()+60);
 						g.drawLine(400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20-30-(j*30), diagram.figura(finalLine).getY()+60, 400+380-10*(diagram.figura(startLine).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(startLine).getLine().length()/4)-20)-400)/2, diagram.figura(finalLine).getY()+60);
@@ -105,7 +87,7 @@ public class SingleGraphics extends JPanel {
 						g.drawLine(400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20)-400)+30+(j*30), diagram.figura(startLine).getY()+25, 400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20)-400)+30+(j*30), diagram.figura(finalLine).getY()+60);
 						g.drawLine(400+380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(lineaLarga).getLine().length()/4)-20)-400)+30+(j*30), diagram.figura(finalLine).getY()+60, 400+380-10*(diagram.figura(startLine).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(startLine).getLine().length()/4)-20)-400)/2, diagram.figura(finalLine).getY()+60);
 						g.drawLine(400+380-10*(diagram.figura(startLine).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(startLine).getLine().length()/4)-20)-400)/2, diagram.figura(finalLine).getY()+60, 400+380-10*(diagram.figura(startLine).getLine().length()/4)-20+(this.getWidth()-2*(380-10*(diagram.figura(startLine).getLine().length()/4)-20)-400)/2, diagram.figura(finalLine).getY()+90);
-					}
+					}*/
 					j++;
 				}
 			}
@@ -114,7 +96,7 @@ public class SingleGraphics extends JPanel {
 			}
 			i++;
 		}
-
-
+		Image image = Toolkit.getDefaultToolkit().getImage("C:\\Users\\este0\\Downloads\\arrow.gif");
+		g.drawImage(image,1150,diagram.y+10,50,30,null);
 	}
 }

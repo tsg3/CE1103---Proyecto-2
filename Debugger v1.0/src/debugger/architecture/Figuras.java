@@ -10,6 +10,9 @@ import java.awt.Rectangle;
 import java.util.Scanner;
 
 import javax.swing.JPanel;
+
+import debugger.handlers.JavaToTxt;
+
 import javax.swing.JFrame;
 
 public class Figuras extends JPanel{

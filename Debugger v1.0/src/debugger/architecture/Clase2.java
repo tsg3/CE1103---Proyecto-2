@@ -1,19 +1,14 @@
 package debugger.architecture;
 public class Clase2 {
 	public static void main(String[] args) {
-		Clase2 c = new Clase2();
-		String mensaje = "Hola Mundo";
+		int n1 = 6;
+		int n2 = 8;
+		int suma = n1 + n2;
 		int i = 0;
-		int j = 0;
-		if(true){
-			System.out.println(mensaje);
-			while (j<3){
-				System.out.println(mensaje);
-				j++;
-			}
-			i++;
+		while (i<3){
+		System.out.println(suma);
+		i++;
 		}
-		System.out.println("Fin");
-		System.out.println(".");
+		System.out.println(suma);
 	}
 }

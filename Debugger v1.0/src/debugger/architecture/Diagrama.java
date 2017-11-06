@@ -5,6 +5,7 @@ public class Diagrama {
 	public Figura root = null;
 	public int largo = 0;
 	public int ciclos=0;
+	public int y=0;
 
 	public void add(String line){
 		Figura fig = new Figura();
@@ -20,6 +21,7 @@ public class Diagrama {
 			while (current.getNext()!=null)
 				current=current.getNext();
 			current.setNext(fig);
+			fig.setPrev(current);
 		}
 	}
 	public Figura find(String line){
@@ -28,7 +30,7 @@ public class Diagrama {
 		else if (line.contains(root.getLine()))
 			return root;
 		else{
-			Figura current = root;
+			Figura current = root.getNext();
 			while (current!=null){
 				if (line.contains(current.getLine()))
 					return current;
@@ -37,7 +39,7 @@ public class Diagrama {
 			return null;
 		}
 	}
-	Figura figura (int pos){
+	public Figura figura (int pos){
 		int i = 0;
 		Figura current = root;
 		if (pos==0)

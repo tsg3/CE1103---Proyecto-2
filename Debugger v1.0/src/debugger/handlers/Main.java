@@ -1,5 +1,4 @@
 package debugger.handlers;
-
 import java.util.Scanner;
 
 import javax.swing.Box;
@@ -16,7 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import debugger.architecture.Figuras;
-import debugger.architecture.SimpleTrace;
+import debugger.interfaces.VentanaO;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 
@@ -44,9 +43,29 @@ public class Main extends AbstractHandler {
         if (result == JOptionPane.OK_OPTION){
         	if (false)
         	    System.err.println("Usage: runTrace <program>");
-        	else
-        	    new SimpleTrace();
+        	//else
+        	    //new SimpleTrace();
         }
 		return null;
+	}
+
+	public static void main (String[] args){
+
+		JTextField clase = new JTextField(5);
+		JTextField proyecto = new JTextField(5);
+
+        JPanel openDebugger = new JPanel();
+        openDebugger.add(new JLabel("Clase:"));
+        openDebugger.add(clase);
+        openDebugger.add(Box.createHorizontalStrut(15));
+        openDebugger.add(new JLabel("Proyecto:"));
+        openDebugger.add(proyecto);
+
+        int result = JOptionPane.showConfirmDialog(null, openDebugger,
+            "Ingrese el proyecto y la clase a debuggear:", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION){
+        	new VentanaO("Clase2", "Debugger");
+        }
+
 	}
 }

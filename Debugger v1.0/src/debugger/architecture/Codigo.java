@@ -3,9 +3,9 @@ package debugger.architecture;
 public class Codigo {
 
 	Linea root=null;
-	int largo=0;
+	public int largo=0;
 
-	void add(String texto){
+	public void add(String texto){
 		Linea linea = new Linea(texto);
 		largo++;
 		if (root==null)
@@ -21,7 +21,7 @@ public class Codigo {
 
 	}
 
-	String linea(int pos){
+	public String linea(int pos){
 		int i = 0;
 		Linea current = root;
 		if (pos==0)
