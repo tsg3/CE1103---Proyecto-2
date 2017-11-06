@@ -50,5 +50,16 @@ public class Diagrama {
 			return current;
 		}
 	}
+	int lineaLarga(){
+		int posLineaLarga=0;
+		String lineaLarga="";
+		for(int i = 0; i<largo; i++){
+			if (figura(i).getLine().length()>lineaLarga.length()){
+				lineaLarga=figura(i).getLine();
+				posLineaLarga=i;
+			}
+		}
+		return posLineaLarga;
+	}
 
 }
