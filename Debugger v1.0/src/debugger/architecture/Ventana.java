@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 public class Ventana {
 
 	public static void main (String[] args) {
-		SingleGraphics g = new SingleGraphics("Clase2");
+		SingleGraphics g = new SingleGraphics("Clase");
 		g.vars.add("x",0);
 		g.vars.add("y",1);
 

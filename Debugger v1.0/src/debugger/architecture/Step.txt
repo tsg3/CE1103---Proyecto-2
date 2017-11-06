@@ -1,0 +1,13 @@
+package debugger.architecture;
+import javax.swing.JOptionPane;
+public class Step{
+	public boolean StepInto(){
+		int ax = JOptionPane.showConfirmDialog(null, "Quieres entrar al metodo ?");
+        if(ax == JOptionPane.YES_OPTION){
+            JOptionPane.showMessageDialog(null, "Step Into");
+            return true;
+        }
+        else
+        	return false;
+	}
+}

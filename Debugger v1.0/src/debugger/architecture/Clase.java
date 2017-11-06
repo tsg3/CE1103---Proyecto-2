@@ -3,11 +3,15 @@ public class Clase {
 
 	public static void main(String[] args) {
 
-		String mensaje;
+		int i = 0;
+		while (i<3){
+			System.out.println("i = " + i);
+			System.out.println("i^2 = " + (i*i));
+			i++;
+		}
 
-		mensaje = "Hola Mundo!";
+		System.out.println("Fin");
 
-		System.out.println(mensaje);
 
 	}
 
